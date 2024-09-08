@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/briandowns/spinner"
 	_ "image/jpeg"
 	_ "image/png"
 	"maifetch/pkg/maitea"
 	"strings"
+	"time"
 )
 
 func createInfoStrings(profile maitea.Profile, plays []maitea.Play, scoreCount uint) []string {
@@ -92,12 +94,23 @@ func main() {
 	}
 
 	// get users recent plays
-	plays, err := client.GetPlays()
-	if err != nil {
-		fmt.Println(err)
+	apiLoading := make(chan []maitea.Play)
+	go func() {
+
+		plays, err := client.GetPlays()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		apiLoading <- plays.CurrentPage()
+	}()
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Suffix = " Loading..."
+	s.Start()
+	select {
+	case plays := <-apiLoading:
+		s.Stop()
+		Output(plays, profiles[0], config.LogoSize, config.ScoreCount)
 		return
 	}
-	page := plays.CurrentPage()
-
-	Output(page, profiles[0], config.LogoSize, config.ScoreCount)
 }

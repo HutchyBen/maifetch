@@ -25,4 +25,3 @@ s
 ## todo
 - test it properly
 - add friendly errors
-- add a loading message because api is slow
