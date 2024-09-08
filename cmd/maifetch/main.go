@@ -6,6 +6,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"maifetch/pkg/maitea"
+	"os"
 	"strings"
 	"time"
 )
@@ -100,7 +101,7 @@ func main() {
 		plays, err := client.GetPlays()
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		apiLoading <- plays.CurrentPage()
 	}()
@@ -111,6 +112,9 @@ func main() {
 	case plays := <-apiLoading:
 		s.Stop()
 		Output(plays, profiles[0], config.LogoSize, config.ScoreCount)
+		return
+	case <-time.After(30 * time.Second):
+		fmt.Println("API timed out")
 		return
 	}
 }
