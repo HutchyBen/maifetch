@@ -1,8 +1,6 @@
 package maitea
 
 import (
-	"fmt"
-	"io"
 	"time"
 )
 
@@ -81,9 +79,6 @@ func (api *APIClient) GetPlays() (Pager[[]Play], error) {
 // It is sorted by recently played and is NOT paginated
 // This is very slow. GetPlays is recommended
 func (api *APIClient) GetAllPlays() (Pager[[]Play], error) {
-	res, _ := api.Get("/api/v1/plays/all")
-	data, _ := io.ReadAll(res.Body)
-	fmt.Println(string(data))
 	page, err := getPage[[]Play](api, baseURL+"/api/v1/plays/all")
 	if err != nil {
 		return Pager[[]Play]{}, err
@@ -99,6 +94,7 @@ func (api *APIClient) GetBestScores() (Pager[[]Score], error) {
 	if err != nil {
 		return Pager[[]Score]{}, err
 	}
+
 	return Pager[[]Score]{page}, nil
 }
 

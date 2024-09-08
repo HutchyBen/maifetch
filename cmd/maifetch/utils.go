@@ -30,7 +30,11 @@ func UrlToAscii(url string, size int) (string, error) {
 	convertOptions.FixedHeight = size
 	// Create the image converter
 	converter := convert.NewImageConverter()
-	res, _ := http.Get(url)
+	res, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+
 	img, _, err := image.Decode(res.Body)
 	if err != nil {
 		return "", err

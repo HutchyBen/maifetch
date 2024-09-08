@@ -49,7 +49,7 @@ type Profile struct {
 func (api *APIClient) GetProfiles() ([]Profile, error) {
 	res, err := api.Get("/api/v1/profiles")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	profiles := struct {
