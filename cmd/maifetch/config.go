@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/alecthomas/kong"
 	"github.com/kelseyhightower/envconfig"
-	"os"
 )
 
 type MaifetchConfig struct {

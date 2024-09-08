@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/aybabtme/rgbterm"
-	"github.com/qeesung/image2ascii/convert"
 	"image"
 	"net/http"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/aybabtme/rgbterm"
+	"github.com/qeesung/image2ascii/convert"
 )
 
 func WideToNormal(str string) string {

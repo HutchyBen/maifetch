@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/briandowns/spinner"
 	_ "image/jpeg"
 	_ "image/png"
 	"maifetch/pkg/maitea"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/briandowns/spinner"
 )
 
 func createInfoStrings(profile maitea.Profile, plays []maitea.Play, scoreCount uint) []string {
