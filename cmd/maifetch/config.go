@@ -6,7 +6,6 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/kelseyhightower/envconfig"
 	"os"
-	"runtime"
 )
 
 type MaifetchConfig struct {
@@ -16,32 +15,12 @@ type MaifetchConfig struct {
 	LogoSize    int      `envconfig:"logo_size" json:"logoSize" help:"Size of the ASCII logo (<1 to disable)" short:"l"`
 }
 
-func getDefaultPath() (string, error) {
-	switch runtime.GOOS {
-	case "windows":
-		return os.Getenv("APPDATA"), nil
-	case "darwin":
-		// ive never used macos so like lol this path is recommended from stack overflow
-		return os.Getenv("HOME") + "/Library/Application Support", nil
-	case "linux":
-		configPath := os.Getenv("XDG_CONFIG_HOME")
-		if configPath == "" {
-			configPath = os.Getenv("HOME") + "/.config"
-		}
-		return configPath, nil
-
-	default:
-		return "", fmt.Errorf("unsupported platform")
-	}
-
-}
-
 // LoadConfig will load config in order of priority CLI > ENV_VARS > CONFIG_FILE
 func LoadConfig() (*MaifetchConfig, error) {
 	var cliOptions MaifetchConfig // this is seperate as needs to be parsed first as generally want config file from here but takes priority later
 	var config MaifetchConfig
 
-	defaultPath, err := getDefaultPath()
+	defaultPath, err := os.UserConfigDir()
 	if err != nil {
 		return nil, err
 	}

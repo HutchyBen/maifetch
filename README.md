@@ -13,6 +13,8 @@ also contains a little api wrapper for maitea too :D
 | config file  | json file to store config variables                | [refer to below](#default-config-location) | `MAITEA_CONFIG_FILE` | `--config-file` `-c`  |
 
 ### Default config location
+obtained from `os.UserConfigDir` 
+
 | platform | location                                                    |
 |----------|-------------------------------------------------------------|
 | Windows  | `%APPDATA%/maifetch.json`                                   |
