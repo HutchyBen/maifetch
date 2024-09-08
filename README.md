@@ -13,9 +13,11 @@ also contains a little api wrapper for maitea too :D
 | config file  | json file to store config variables                | [refer to below](#default-config-location) | `MAITEA_CONFIG_FILE` | `--config-file` `-c`  |
 
 ### Default config location
-- Windows: `%APPDATA%`
-- Linux: `XDG_CONFIG_HOME` then `~/.config`
-- MacOS: `~/Library/Application Support`
+| platform | location                                                    |
+|----------|-------------------------------------------------------------|
+| Windows  | `%APPDATA%/maifetch.json`                                   |
+| Linux    | `$XDG_CONFIG_HOME/maifetch.json`  `~/.config/maifetch.json` |
+| OSX      | `~/Library/Application Support/maifetch.json`               |
 
 ## how to build
 1. clone the project with `git clone https://github.com/HutchyBen/maifetch`
