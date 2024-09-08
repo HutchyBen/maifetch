@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-func createInfoStrings(profile maitea.Profile, plays []maitea.Play) []string {
+func createInfoStrings(profile maitea.Profile, plays []maitea.Play, scoreCount uint) []string {
 	name := WideToNormal(profile.Name)
 
-	scoreStrings := make([]string, 5*3) // this is really lazy coding line1. name and diff, line2. score and achivement and fc label. line3. padding
+	scoreStrings := make([]string, scoreCount*3) // this is really lazy coding line1. name and diff, line2. score and achivement and fc label. line3. padding
 
 	// get 5 latest plays
-	for i := 0; i < 5; i++ {
+	for i := uint(0); i < scoreCount; i++ {
 		play := plays[i]
 		fcLabel := ""
 		if play.FullComboLabel != nil {
@@ -22,7 +22,6 @@ func createInfoStrings(profile maitea.Profile, plays []maitea.Play) []string {
 		}
 		scoreStrings[i*3] = fmt.Sprintf("  %s  %s", play.Song.Name.En, maitea.DifficultyString(play.DifficultyLevel.Value))
 		scoreStrings[i*3+1] = fmt.Sprintf("  %s %s%% %s %s", play.ScoreFormatted, play.AchievementFormatted, maitea.RankString(play.Rank), fcLabel)
-		scoreStrings[i*3+2] = ""
 	}
 
 	return append([]string{
@@ -36,23 +35,7 @@ func createInfoStrings(profile maitea.Profile, plays []maitea.Play) []string {
 	}, scoreStrings...)
 }
 
-func Output(api *maitea.APIClient, profile maitea.Profile, logoSize int) {
-	logo, err := UrlToAscii(profile.Options.Icon.Png, logoSize)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	logoLines := strings.Split(logo, "\n")
-	plays, err := api.GetPlays()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	page := plays.CurrentPage()
-	infoLines := createInfoStrings(profile, page)
-
-	// Output all the lines together
+func printCombined(infoLines []string, logoLines []string, logoSize int) {
 	maxLength := len(logoLines)
 	if len(infoLines) > maxLength {
 		maxLength = len(infoLines)
@@ -72,20 +55,49 @@ func Output(api *maitea.APIClient, profile maitea.Profile, logoSize int) {
 	}
 }
 
+func Output(page []maitea.Play, profile maitea.Profile, logoSize int, scoreCount uint) {
+	infoLines := createInfoStrings(profile, page, scoreCount)
+
+	if logoSize > 0 {
+		logo, err := UrlToAscii(profile.Options.Icon.Png, logoSize)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		logoLines := strings.Split(logo, "\n")
+		printCombined(infoLines, logoLines, logoSize)
+
+	} else {
+		fmt.Println(strings.Join(infoLines, "\n"))
+	}
+}
+
 func main() {
-	logoSize := 20
-	client := maitea.NewAPIClient("PUT YOUR FLIPPING TOKEN HERE") // todo: not be lazy and make a config system or something lol
+	config, err := LoadConfig()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	client := maitea.NewAPIClient(config.AccessToken)
 	profiles, err := client.GetProfiles()
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
-
-	// TODO: Make command line options
 
 	if len(profiles) == 0 {
 		fmt.Println("No profiles found")
 		return
 	}
 
-	Output(client, profiles[0], logoSize)
+	// get users recent plays
+	plays, err := client.GetPlays()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	page := plays.CurrentPage()
+
+	Output(page, profiles[0], config.LogoSize, config.ScoreCount)
 }
