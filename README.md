@@ -1,5 +1,5 @@
 # maifetch
-a really lazy fetch tool for [maitea](https://maitea.app) written in zig\
+a really lazy fetch tool for [maitea](https://maitea.app) written in Odin\
 also contains a little api wrapper for maitea too :D
 
 ![image](https://github.com/user-attachments/assets/96cd7018-8a00-4785-a1a8-9fe503263662)
@@ -23,8 +23,10 @@ obtained from `os.UserConfigDir`
 
 ## how to build
 1. clone the project with `git clone https://github.com/HutchyBen/maifetch`
-2. build with `zig build`
-3. run outputted executable ensuring access token is either
+2. install [Odin](https://odin-lang.org/)
+3. build with `odin build src -out:maifetch`
+4. ensure `curl` is available on `PATH`
+5. run outputted executable ensuring access token is either
     - in config file
     - in environment variables
     - in command line options
@@ -32,7 +34,7 @@ obtained from `os.UserConfigDir`
 ## testing
 
 ```sh
-zig build test
+odin test src
 ```
 
 
