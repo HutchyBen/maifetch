@@ -1,5 +1,5 @@
 # maifetch
-a really lazy fetch tool for [maitea](https://maitea.app) written in go\
+a really lazy fetch tool for [maitea](https://maitea.app) written in Java 8\
 also contains a little api wrapper for maitea too :D
 
 ![image](https://github.com/user-attachments/assets/96cd7018-8a00-4785-a1a8-9fe503263662)
@@ -12,6 +12,8 @@ also contains a little api wrapper for maitea too :D
 | score count  | amount of scores to display (max 12)               | `4`                                        | `MAITEA_SCORE_COUNT`  | `--score-count` `-s`  |
 | config file  | json file to store config variables                | [refer to below](#default-config-location) | `MAITEA_CONFIG_FILE` | `--config-file` `-c`  |
 
+The Java rewrite also accepts the previous `MAIFETCH_*` environment variable prefix for compatibility.
+
 ### Default config location
 obtained from `os.UserConfigDir` 
 
@@ -23,8 +25,8 @@ obtained from `os.UserConfigDir`
 
 ## how to build
 1. clone the project with `git clone https://github.com/HutchyBen/maifetch`
-2. build with `go build maifetch/cmd/maifetch`
-3. run outputted executable ensuring access token is either
+2. build with `mvn package`
+3. run the shaded jar with `java -jar target/maifetch-1.0.0-SNAPSHOT.jar`, ensuring access token is either
     - in config file
     - in environment variables
     - in command line options
