@@ -1,0 +1,26 @@
+name: Kotlin CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "8"
+
+      - name: Compile and package
+        run: mvn -q package
+
+      - name: Test
+        run: mvn -q exec:java -Dexec.mainClass=maifetch.MaifetchTests -Dexec.classpathScope=test
+
+      - name: CLI smoke test
+        run: java -jar target/maifetch-0.1.0.jar --help
