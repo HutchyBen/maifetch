@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- AI-assisted with OpenAI GPT-5. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Maifetch.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Maifetch/Maifetch.fsproj" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+</Project>

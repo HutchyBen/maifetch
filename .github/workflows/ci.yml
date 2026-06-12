@@ -1,0 +1,20 @@
+# AI-assisted with OpenAI GPT-5.
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build
+        run: dotnet build maifetch.sln --configuration Release
+      - name: Test
+        run: dotnet run --project tests/Maifetch.Tests/Maifetch.Tests.fsproj --configuration Release
