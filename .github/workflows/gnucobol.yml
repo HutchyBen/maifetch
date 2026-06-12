@@ -1,0 +1,18 @@
+# AI-assisted with OpenAI GPT-5 Codex.
+name: GnuCOBOL
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GnuCOBOL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnucobol curl
+      - name: Build and test
+        run: make test

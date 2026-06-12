@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "score_formatted": "1,000,000",
+      "achievement_formatted": "100.5000",
+      "rank": "SSS+",
+      "full_combo_label": "FC",
+      "difficulty_level": {
+        "value": "master"
+      },
+      "song": {
+        "name": {
+          "en": "Test Song"
+        }
+      }
+    },
+    {
+      "score_formatted": "999,999",
+      "achievement_formatted": "99.9999",
+      "rank": "SS",
+      "full_combo_label": null,
+      "difficulty_level": {
+        "value": "expert"
+      },
+      "song": {
+        "name": {
+          "en": "Second Song"
+        }
+      }
+    }
+  ]
+}

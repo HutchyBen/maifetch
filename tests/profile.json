@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "id": 42,
+      "name": "MAI",
+      "rating": 1234,
+      "rating_highest": 1500,
+      "level": 17,
+      "play_stats": {
+        "total": 99
+      },
+      "options": {
+        "icon": {
+          "id": 1,
+          "png": "https://example.test/icon.png",
+          "webp": ""
+        }
+      }
+    }
+  ]
+}
