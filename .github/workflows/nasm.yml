@@ -1,0 +1,15 @@
+name: NASM
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  fixture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install NASM
+        run: sudo apt-get update && sudo apt-get install -y nasm build-essential
+      - name: Run fixture test
+        run: ./test/run-fixture.sh

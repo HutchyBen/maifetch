@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "achievement_formatted": "100.5000",
+      "score_formatted": "1,009,000",
+      "rank": "SSS+",
+      "full_combo_label": "FC",
+      "difficulty_level": {
+        "value": "master"
+      },
+      "song": {
+        "name": {
+          "en": "Latent Kingdom",
+          "jp": "Latent Kingdom"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "achievement_formatted": "99.7500",
+      "score_formatted": "995,000",
+      "rank": "SS",
+      "full_combo_label": null,
+      "difficulty_level": {
+        "value": "expert"
+      },
+      "song": {
+        "name": {
+          "en": "Citrus City",
+          "jp": "Citrus City"
+        }
+      }
+    }
+  ]
+}

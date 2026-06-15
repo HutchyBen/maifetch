@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "id": 42,
+      "name": "MaiTea",
+      "rating": 12345,
+      "rating_highest": 13001,
+      "level": 25,
+      "play_stats": {
+        "total": 321
+      },
+      "options": {
+        "icon": {
+          "id": 7,
+          "png": "https://example.test/icon.png",
+          "webp": "https://example.test/icon.webp"
+        }
+      }
+    }
+  ]
+}
