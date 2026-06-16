@@ -1,5 +1,5 @@
 # maifetch
-a really lazy fetch tool for [maitea](https://maitea.app) written in go\
+a really lazy fetch tool for [maitea](https://maitea.app) written in soup\
 also contains a little api wrapper for maitea too :D
 
 ![image](https://github.com/user-attachments/assets/96cd7018-8a00-4785-a1a8-9fe503263662)
