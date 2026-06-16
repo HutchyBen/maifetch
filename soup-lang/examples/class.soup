@@ -1,0 +1,24 @@
+# Classes in AltLua
+class Vec2 {
+    fn __init__(self, x, y) {
+        self.x = x
+        self.y = y
+    }
+
+    fn mag(self) {
+        return (self.x * self.x + self.y * self.y) ** 0.5
+    }
+
+    fn add(self, other) {
+        return Vec2.__init__({x: self.x + other.x, y: self.y + other.y}, 0, 0)
+    }
+
+    fn __str__(self) {
+        return "Vec2(" .. self.x .. ", " .. self.y .. ")"
+    }
+}
+
+# Using the class
+let v1 = {x: 3, y: 4}
+let mag = Vec2.mag(v1)
+print("magnitude: ", mag)

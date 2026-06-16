@@ -1,0 +1,43 @@
+# maifetch.soup — Main entry point for Maifetch
+# Fetches MaiTea profile and recent plays, displays with ASCII icon
+
+from "config" import load_config
+from "maitea" import get_profiles, get_plays
+from "display" import colour, url_to_ascii, create_info_strings, print_combined
+
+let config = load_config()
+
+let token = config["access_token"]
+if token == None or token == "" {
+    print("Error: Access token is required")
+    print("Set MAITEA_TOKEN environment variable or use -t <token>")
+    os.exit(1)
+}
+
+let logo_size = config["logo_size"]
+let score_count = config["score_count"]
+
+let profiles = get_profiles(token)
+if profiles == None {
+    print("Error: Failed to fetch profiles")
+    os.exit(1)
+}
+
+let profile = profiles[1]
+if profile == None {
+    print("Error: No profiles found")
+    os.exit(1)
+}
+
+let plays = get_plays(token)
+if plays == None {
+    print("Error: Failed to fetch plays")
+    os.exit(1)
+}
+
+let icon_url = profile?.options?.icon?.url ?: ""
+
+let logo = icon_url |> (|url| url_to_ascii(url, logo_size * 2, logo_size))
+
+let display_data = create_info_strings(profile, plays, score_count)
+print_combined(logo, display_data)

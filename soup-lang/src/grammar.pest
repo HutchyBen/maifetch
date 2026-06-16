@@ -1,0 +1,212 @@
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+COMMENT = _{ "#" ~ (!("\n" | "\r") ~ ANY)* }
+
+program = { SOI ~ statement* ~ EOI }
+
+statement = _{
+    let_decl
+    | const_decl
+    | assignment
+    | if_stmt
+    | for_stmt
+    | while_stmt
+    | repeat_stmt
+    | fn_decl
+    | consteval_fn_decl
+    | class_decl
+    | return_stmt
+    | pass_stmt
+    | import_stmt
+    | from_import_stmt
+    | defer_stmt
+    | errdefer_stmt
+    | with_stmt
+    | divide_stmt
+    | perform_stmt
+    | goto_stmt
+    | label_stmt
+    | asm_stmt
+    | progn_stmt
+    | expr_stmt
+}
+
+let_decl = { kw_let ~ ident ~ (":" ~ ident)? ~ eq ~ expr }
+const_decl = { kw_const ~ ident ~ (":" ~ ident)? ~ eq ~ expr }
+
+assignment = { lvalue ~ eq ~ expr }
+
+if_stmt = { kw_if ~ expr ~ block ~ elif_clause* ~ else_clause? }
+elif_clause = { kw_elif ~ expr ~ block }
+else_clause = { kw_else ~ block }
+for_stmt = { kw_for ~ ident ~ kw_in ~ expr ~ block }
+while_stmt = { kw_while ~ expr ~ block }
+repeat_stmt = { kw_repeat ~ block ~ kw_until ~ expr }
+
+fn_decl = { kw_fn ~ ident ~ lparen ~ param_list? ~ rparen ~ (":" ~ ident)? ~ block }
+consteval_fn_decl = { kw_consteval ~ kw_fn ~ ident ~ lparen ~ param_list? ~ rparen ~ block }
+
+class_decl = { kw_class ~ ident ~ (lparen ~ ident ~ rparen)? ~ block }
+return_stmt = { kw_return ~ expr? }
+pass_stmt = { kw_pass }
+import_stmt = { kw_import ~ string_lit }
+from_import_stmt = { kw_from ~ string_lit ~ kw_import ~ ident ~ (comma ~ ident)* }
+
+defer_stmt = { kw_defer ~ expr }
+errdefer_stmt = { kw_errdefer ~ expr }
+
+with_stmt = { kw_with ~ with_clause ~ (comma ~ with_clause)* ~ (kw_else ~ block)? ~ block }
+with_clause = { ident ~ eq ~ expr }
+
+divide_stmt = { "DIVIDE" ~ expr ~ "INTO" ~ lvalue }
+perform_stmt = { "PERFORM" ~ (block | ident | integer_lit) }
+
+goto_stmt = { kw_goto ~ integer_lit }
+label_stmt = { integer_lit ~ kw_continue ~ block }
+
+asm_stmt = { kw_asm ~ lbrace ~ asm_body ~ rbrace }
+asm_body = { (!rbrace ~ ANY)* }
+
+progn_stmt = { kw_progn ~ block }
+
+block = { lbrace ~ statement* ~ rbrace }
+
+lvalue = { ident ~ (index_expr | member_expr | safe_member_expr)* }
+
+param_item = { ident ~ (":" ~ ident)? }
+param_list = { param_item ~ (comma ~ param_item)* }
+arg_list = { expr ~ (comma ~ expr)* }
+
+expr = { elvis_expr }
+elvis_expr = { pipe_expr ~ (op_elvis ~ pipe_expr)? }
+pipe_expr = { or_expr ~ (pipe_op ~ or_expr)* }
+or_expr = { and_expr ~ (or_tail)* }
+or_tail = { kw_or ~ and_expr }
+and_expr = { comp_expr ~ (and_tail)* }
+and_tail = { kw_and ~ comp_expr }
+comp_expr = { concat_expr ~ (comp_tail)? }
+comp_tail = { comp_op ~ concat_expr }
+comp_op = { op_eq_n | op_neq_n | op_le_n | op_ge_n | op_lt_n | op_gt_n | kw_in_n | kw_is_n }
+op_eq_n = { "==" }
+op_neq_n = { "!=" }
+op_le_n = { "<=" }
+op_ge_n = { ">=" }
+op_lt_n = { "<" }
+op_gt_n = { ">" }
+kw_in_n = { "in" }
+kw_is_n = { "is" }
+concat_expr = { add_expr ~ (concat_tail)* }
+concat_tail = { op_concat ~ add_expr }
+add_expr = { mul_expr ~ (add_tail)* }
+add_tail = { add_op ~ mul_expr }
+mul_expr = { unary_expr ~ (mul_tail)* }
+mul_tail = { mul_op ~ unary_expr }
+unary_expr = { unary_op ~ unary_expr | power_expr }
+power_expr = { call_expr ~ (pow_tail)* }
+pow_tail = { op_pow ~ call_expr }
+call_expr = { atom ~ postfix_op* }
+postfix_op = _{ call_args | index_expr | member_expr | safe_member_expr }
+call_args = { lparen ~ arg_list? ~ rparen }
+index_expr = { lbrack ~ expr ~ rbrack }
+member_expr = { delim_dot ~ ident }
+safe_member_expr = { delim_qmark_dot ~ ident }
+
+paren_expr = { lparen ~ expr ~ rparen }
+
+atom = _{
+    number_lit
+    | string_lit
+    | bool_lit
+    | none_lit
+    | list_lit
+    | dict_lit
+    | lambda
+    | paren_expr
+    | sexpr
+    | ident
+}
+
+sexpr = { lparen ~ ident ~ expr* ~ rparen }
+
+number_lit = @{ ("-"? ~ integer_lit ~ ("." ~ ASCII_DIGIT+)?) }
+integer_lit = @{ ASCII_DIGIT+ }
+
+string_lit = @{ "\"" ~ (escape | !("\"" | "\\" | "\n" | "\r") ~ ANY)* ~ "\"" }
+escape = @{ "\\" ~ ANY }
+bool_lit = { kw_True | kw_False }
+none_lit = { kw_None }
+ident = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+
+list_lit = { lbrack ~ (expr ~ (comma ~ expr)*)? ~ rbrack }
+dict_lit = { lbrace ~ (pair ~ (comma ~ pair)*)? ~ rbrace }
+pair = { expr ~ delim_colon ~ expr }
+
+lambda = { delim_pipe ~ ident ~ (comma ~ ident)* ~ delim_pipe ~ expr }
+
+expr_stmt = { expr ~ !eq }
+
+kw_let = _{ "let" }
+kw_const = _{ "const" }
+kw_fn = _{ "fn" }
+kw_consteval = _{ "consteval" }
+kw_return = _{ "return" }
+kw_if = _{ "if" }
+kw_elif = _{ "elif" }
+kw_else = _{ "else" }
+kw_for = _{ "for" }
+kw_in = _{ "in" }
+kw_while = _{ "while" }
+kw_repeat = _{ "repeat" }
+kw_until = _{ "until" }
+kw_class = _{ "class" }
+kw_pass = _{ "pass" }
+kw_import = _{ "import" }
+kw_from = _{ "from" }
+kw_defer = _{ "defer" }
+kw_errdefer = _{ "errdefer" }
+kw_with = _{ "with" }
+kw_goto = _{ "goto" }
+kw_continue = _{ "continue" }
+kw_asm = _{ "asm" }
+kw_progn = _{ "progn" }
+kw_and = _{ "and" }
+kw_or = _{ "or" }
+kw_not = _{ "not" }
+kw_is = _{ "is" }
+kw_True = _{ "True" }
+kw_False = _{ "False" }
+kw_None = _{ "None" }
+
+lbrace = _{ "{" }
+rbrace = _{ "}" }
+lbrack = _{ "[" }
+rbrack = _{ "]" }
+lparen = _{ "(" }
+rparen = _{ ")" }
+comma = _{ "," }
+delim_colon = _{ ":" }
+delim_pipe = _{ "|" }
+delim_dot = _{ "." }
+delim_qmark_dot = _{ "?." }
+eq = _{ "=" }
+
+op_plus = _{ "+" }
+op_minus = _{ "-" }
+op_star = _{ "*" }
+op_slash = _{ "/" }
+op_intdiv = _{ "//" }
+op_mod = _{ "%" }
+op_pow = _{ "**" }
+op_eq = _{ "==" }
+op_neq = _{ "!=" }
+op_le = _{ "<=" }
+op_ge = _{ ">=" }
+op_lt = _{ "<" }
+op_gt = _{ ">" }
+op_concat = { ".." }
+op_elvis = _{ "?:" }
+pipe_op = _{ "|>" }
+
+add_op = { op_plus | op_minus }
+mul_op = { op_star | op_intdiv | op_slash | op_mod }
+
+unary_op = { op_minus | kw_not }

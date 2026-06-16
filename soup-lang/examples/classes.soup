@@ -1,0 +1,27 @@
+# Class demonstration
+class Counter {
+    fn __init__(self, start) {
+        self.value = start
+    }
+
+    fn inc(self) {
+        self.value = self.value + 1
+    }
+
+    fn get(self) {
+        return self.value
+    }
+}
+
+# Manual instantiation
+let c = {"value": 0}
+Counter.__init__(c, 10)
+Counter.inc(c)
+print("Counter value: ", Counter.get(c))
+
+# Inheritance
+class FastCounter(Counter) {
+    fn inc(self) {
+        self.value = self.value + 2
+    }
+}
