@@ -1,0 +1,244 @@
+# display.soup — Output formatting for Maifetch
+# Returns: { colour, url_to_ascii, create_info_strings, print_combined }
+
+let esc: str = string.char(27)
+let CYAN: str = esc .. "[38;2;72;184;200m"
+let RESET: str = esc .. "[0m"
+
+let DIFF_COLORS = {
+    "Basic": esc .. "[32m",
+    "Advanced": esc .. "[33m",
+    "Expert": esc .. "[31m",
+    "Master": esc .. "[35m",
+    "Re:Master": esc .. "[95m",
+    "Utage": esc .. "[38;2;255;165;0m"
+}
+
+consteval fn esc_code(n: int) { return esc .. "[" .. n .. "m" }
+
+fn colour(text: str) {
+    return CYAN .. text .. RESET
+}
+
+fn difficulty_string(name: str) {
+    return DIFF_COLORS[name] ?: name
+}
+
+fn rank_color(rank: str) {
+    if rank == "SSS+" or rank == "SSS" {
+        return esc_code(38) .. ";2;255;215;0m"
+    }
+    if rank == "SS+" or rank == "SS" {
+        return esc_code(38) .. ";2;218;165;32m"
+    }
+    if rank == "S+" or rank == "S" {
+        return esc_code(38) .. ";2;192;192;192m"
+    }
+    return esc .. "[34m"
+}
+
+fn rank_string(rank: str) {
+    if rank == None or rank == "" { return "" }
+    return rank_color(rank) .. rank .. RESET
+}
+
+fn wide_to_normal(text: str) {
+    let result = ""
+    let i = 1
+    while i <= string.len(text) {
+        let code = string.byte(text, i)
+        if code >= 65281 and code <= 65374 {
+            result = result .. string.char(code - 65248)
+        } elif code == 12288 {
+            result = result .. " "
+        } else {
+            result = result .. string.char(code)
+        }
+        i = i + 1
+    }
+    return result
+}
+
+fn url_to_ascii(url: str, w: int, h: int) {
+    let tmp: str = "/tmp/maifetch_icon.png"
+    defer os.execute("rm -f " .. tmp)
+
+    let dl = "curl -sL \"" .. url .. "\" -o " .. tmp .. " 2>/dev/null"
+    os.execute(dl)
+
+    let cmd: str = "magick " .. tmp .. " -resize " .. w .. "x" .. h .. "! -depth 8 -colorspace sRGB txt:- 2>/dev/null"
+    let f = io.popen(cmd, "r")
+    if f == None { return "" }
+
+    let chars = "@%#*+=-:. "
+    let rows = {}
+    let row_idx = 1
+    let current_row = ""
+    let prev_y = -1
+    let header = True
+
+    with line = f.read(f, "*l") {
+        repeat {
+            if not header {
+                let comma: int = string.find(line, ",")
+                let colon: int = string.find(line, ":")
+                if comma != None and colon != None {
+                    let x_str = string.sub(line, 1, comma - 1)
+                    let y_str = string.sub(line, comma + 1, colon - 1)
+                    let y = tonumber(y_str)
+                    if y != None {
+                        if y != prev_y and prev_y != -1 {
+                            rows[row_idx] = current_row
+                            row_idx = row_idx + 1
+                            current_row = ""
+                        }
+                        prev_y = y
+
+                        let rest = string.sub(line, colon + 1)
+                        let lp  = string.find(rest, "%(")
+                        let rp  = string.find(rest, "%)")
+                        let has_rgb = lp != None and rp != None
+                        let rgb_str = has_rgb and string.sub(rest, lp + 1, rp - 1) or ""
+
+                        let c1 = string.find(rgb_str, ",") or 0
+                        let c2 = 0
+                        if c1 != 0 {
+                            c2 = string.find(rgb_str, ",", c1 + 1) or 0
+                        }
+
+                        let has_colors = c1 != 0 and c2 != 0
+                        let r = has_colors and (tonumber(string.sub(rgb_str, 1, c1 - 1)) or 0) or 0
+                        let g = has_colors and (tonumber(string.sub(rgb_str, c1 + 1, c2 - 1)) or 0) or 0
+                        let b = has_colors and (tonumber(string.sub(rgb_str, c2 + 1)) or 0) or 0
+
+                        let brightness = (r + g + b) / (3.0 * 255.0)
+                        let idx = math.floor(brightness * (string.len(chars) - 1)) + 1
+                        let ch = string.sub(chars, idx, idx)
+                        if ch == " " { ch = "#" }
+
+                        progn {
+                            current_row = current_row .. ch
+                        }
+                    }
+                }
+            } else {
+                header = False
+            }
+
+            line = f.read(f, "*l")
+        } until line == None
+    }
+
+    if current_row != "" {
+        rows[row_idx] = current_row
+    } else {
+        row_idx = row_idx - 1
+    }
+
+    f.close(f)
+
+    let result = ""
+    let i: int = 1
+    while i <= row_idx {
+        if i > 1 { result = result .. "\n" }
+        result = result .. rows[i]
+        i = i + 1
+    }
+    return result
+}
+
+fn create_info_strings(profile, plays, score_count: int) {
+    let name: str = (profile["name"] ?: "Unknown") |> wide_to_normal
+
+    let pid: str     = profile["id"] ?: "?"
+    let rating       = profile["rating"] ?: 0
+    let rating_h     = profile["rating_highest"] ?: 0
+    let level        = profile["level"] ?: 0
+    let total_credits = profile?.play_stats?.total ?: 0
+
+    let lines = {}
+    let idx = 1
+    lines[idx] = CYAN .. name .. RESET
+    idx = idx + 1
+    lines[idx] = "──────────────────────────────"
+    idx = idx + 1
+    lines[idx] = "ID: " .. pid .. "  Rating: " .. rating .. " / " .. rating_h .. "  Level: " .. level .. "  Plays: " .. total_credits
+    idx = idx + 1
+    lines[idx] = ""
+    idx = idx + 1
+
+    if plays != None and plays["data"] != None {
+        let count = 0
+        for item in plays["data"] {
+            if count < score_count {
+                let song_name: str = item?.song?.name ?: "?"
+                let diff_name: str = item?.difficulty?.name ?: "?"
+                let ach  = item["achievement"] ?: 0
+                let rank = item["rank"] ?: ""
+
+                let fc = item?.score_detail?.fc
+                let fc_str = (fc != None and fc != "") and " [" .. fc .. "]" or ""
+
+                lines[idx] = song_name .. " (" .. difficulty_string(diff_name) .. ")" .. fc_str
+                idx = idx + 1
+                lines[idx] = "  " .. ach .. "%  " .. rank_string(rank)
+                idx = idx + 1
+                lines[idx] = ""
+                idx = idx + 1
+            }
+            count = count + 1
+        }
+    }
+
+    return {"lines": lines, "count": idx - 1}
+}
+
+fn print_combined(logo: str, result_data) {
+    let logo_lines = {}
+    let logo_count = 0
+    let rest = logo
+    let done = False
+    while not done {
+        let nl_pos = string.find(rest, "\n")
+        if nl_pos == None {
+            logo_lines[logo_count + 1] = rest
+            logo_count = logo_count + 1
+            done = True
+        } else {
+            logo_lines[logo_count + 1] = string.sub(rest, 1, nl_pos - 1)
+            logo_count = logo_count + 1
+            rest = string.sub(rest, nl_pos + 1)
+            if rest == "" { done = True }
+        }
+    }
+
+    if logo_count > 1 and logo_lines[logo_count] == "" {
+        logo_count = logo_count - 1
+    }
+
+    let line_count = result_data["count"]
+    let result_lines = result_data["lines"]
+
+    let max_lines = logo_count
+    if line_count > max_lines { max_lines = line_count }
+
+    100 continue {
+        let result = ""
+        let lin = 1
+        while lin <= max_lines {
+            let left = logo_count >= lin and logo_lines[lin] or ""
+            let right = line_count >= lin and result_lines[lin] or ""
+
+            let padding = 4
+            let line_str = left .. string.rep(" ", padding) .. right
+            if lin > 1 { result = result .. "\n" }
+            result = result .. line_str
+            lin = lin + 1
+        }
+    }
+    PERFORM 100
+
+    print(result)
+}
+
+return {"colour": colour, "url_to_ascii": url_to_ascii, "create_info_strings": create_info_strings, "print_combined": print_combined}

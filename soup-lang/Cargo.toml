@@ -1,0 +1,12 @@
+[package]
+name = "soup-lang"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pest = "2"
+pest_derive = "2"
+clap = { version = "4", features = ["derive"] }
+
+[profile.release]
+opt-level = 2

@@ -1,0 +1,95 @@
+# config.soup — Configuration loading for Maifetch
+# Returns: { load_config: fn -> config_table }
+
+from "dkjson" import decode
+
+consteval fn merge_defaults(base, overrides) {
+    let result = base
+    result["access_token"] = overrides["access_token"] ?: base["access_token"]
+    result["logo_size"] = overrides["logo_size"] ?: base["logo_size"]
+    result["score_count"] = overrides["score_count"] ?: base["score_count"]
+    return result
+}
+
+let DEFAULTS = merge_defaults({}, {"access_token": "", "logo_size": 20, "score_count": 4})
+
+fn read_json_file(path: str) {
+    let f = io.open(path, "r")
+    if f == None {
+        return None
+    }
+    let content = f.read(f, "*a")
+    f.close(f)
+    return decode(content)
+}
+
+fn parse_cli_args() {
+    let config = {"access_token": "", "logo_size": 20, "score_count": 4}
+    let i = 1
+    repeat {
+        let a = arg[i]
+        if a == "-t" or a == "--access-token" {
+            i = i + 1
+            config["access_token"] = arg[i]
+        } elif a == "-l" or a == "--logo-size" {
+            i = i + 1
+            config["logo_size"] = tonumber(arg[i])
+        } elif a == "-s" or a == "--score-count" {
+            i = i + 1
+            config["score_count"] = tonumber(arg[i])
+        } elif a == "-c" or a == "--config-file" {
+            i = i + 1
+            config["config_file"] = arg[i]
+        }
+        i = i + 1
+    } until arg[i] == None
+    return config
+}
+
+fn read_env() {
+    return {
+        "access_token": os.getenv("MAITEA_TOKEN") ?: "",
+        "logo_size": tonumber(os.getenv("MAITEA_LOGO_SIZE")),
+        "score_count": tonumber(os.getenv("MAITEA_SCORE_COUNT"))
+    }
+}
+
+fn validate_and_clamp(cfg) {
+    if cfg["score_count"] > 12 or cfg["score_count"] < 1 {
+        cfg["score_count"] = 12
+    }
+    if cfg["logo_size"] < 1 {
+        cfg["logo_size"] = 1
+    }
+}
+
+fn load_config() {
+    let cli = parse_cli_args()
+    let env = read_env()
+
+    let cfg_path: str = cli["config_file"] ?: os.getenv("MAITEA_CONFIG_FILE")
+    let cfg_path: str = cfg_path ?: os.getenv("HOME") .. "/.config/maifetch/maifetch.json"
+
+    let file_cfg = read_json_file(cfg_path) ?: {}
+
+    with c = cli, e = env {
+        if c["access_token"] == None or c["access_token"] == "" {
+            let token = e["access_token"]
+        }
+        PERFORM 999
+    }
+
+    999 continue {
+        validate_and_clamp(cli)
+    }
+
+    return cli |> |c| merge_defaults(
+        env  |> |e| merge_defaults(
+            file_cfg |> |f| merge_defaults(DEFAULTS, f),
+            e
+        ),
+        c
+    )
+}
+
+return {"load_config": load_config}

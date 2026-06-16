@@ -1,0 +1,34 @@
+# maitea.soup — MaiTea API client
+# Returns: { get, get_profiles, get_plays }
+
+from "socket.http" import request
+from "ltn12" import sink
+from "dkjson" import decode
+
+let BASE_URL: str = "https://maitea.app"
+
+fn get(path: str, token: str) {
+    let url = BASE_URL .. path
+    with resp_body = {}, headers = {
+        "Authorization": "Bearer " .. token,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    } {
+        let ok = (request {"url": url, "headers": headers, "sink": sink.table(resp_body)})
+        return ok |> |_| decode(table.concat(resp_body))
+    }
+}
+
+fn get_profiles(token: str) {
+    let result = (get "/api/v1/profiles" token)
+    if result == None { return None }
+    return result["data"]
+}
+
+fn get_plays(token: str) {
+    let result = (get "/api/v1/plays" token)
+    if result == None { return None }
+    return result["data"]
+}
+
+return {"get": get, "get_profiles": get_profiles, "get_plays": get_plays}

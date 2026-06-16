@@ -1,0 +1,88 @@
+# Test all 14 language features
+
+fn double(x) { x * 2 }
+fn add(a, b, c) { a + b + c }
+
+# 1. Rust: Pipe operator |>
+let result = 5 |> double
+
+# 2. Zig: defer / errdefer
+fn test_defer() {
+    defer print("cleanup")
+    errdefer print("err cleanup")
+    print("hello")
+}
+
+# 3. Java 8: Stream API detection
+fn test_stream(lst) {
+    lst.stream().filter(|x| x > 2).map(|x| x * 2).collect()
+}
+
+# 4. Kotlin: Elvis operator ?:
+let input = "hello"
+let name = input ?: "default"
+let obj = { field: 42 }
+let safe = obj?.field
+
+# 5. C++20: consteval fn
+consteval fn square(x) { return x * x }
+let compiled = square(5)
+
+# 6. Elixir: with statement
+fn test_with(val) {
+    with x = val, y = x + 1 {
+        print(y)
+    }
+}
+
+# 7. Emacs Lisp: progn block
+progn {
+    print("a")
+    print("b")
+}
+
+# 8. F#: Pipe operator |>
+let doubled = 3 |> double
+
+# 9. GNU COBOL: DIVIDE and PERFORM
+let counter = 10
+DIVIDE 5 INTO counter
+
+fn cleanup() {
+    print("performed cleanup")
+}
+PERFORM cleanup
+
+# 10. Clojure: S-expressions
+let sum = (add 1 2 3)
+
+# 11. Delphi: repeat...until
+fn test_repeat() {
+    let i = 0
+    repeat {
+        i = i + 1
+    } until i > 5
+}
+
+# 12. Crystal: Type annotations
+let x: int = 10
+fn greet(name: str): str {
+    return "hello"
+}
+
+# 13. Fortran: goto and labels
+fn test_goto() {
+    let flag = True
+    if flag {
+        100 continue {
+            print("at label 100")
+        }
+        goto 100
+    }
+}
+
+# 14. x86 ASM: inline assembly
+asm {
+    mov eax, 1
+    int 0x80
+}

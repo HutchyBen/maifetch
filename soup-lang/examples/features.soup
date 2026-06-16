@@ -1,0 +1,81 @@
+# Full feature demo in AltLua
+# Variables
+let name = "AltLua"
+let version = 1.0
+let debug = True
+let nothing = None
+const PI = 3.14159
+
+# Arithmetic
+let sum = 10 + 20
+let diff = 100 - 30
+let product = 5 * 6
+let quotient = 50 / 7
+let intdiv = 50 // 7
+let remainder = 17 % 5
+let power = 2 ** 10
+
+# String concatenation
+let greeting = "Hello" .. " " .. "World"
+
+# Comparisons
+if sum == 30 {
+    print("sum is 30")
+}
+
+if diff != 70 {
+    print("diff is not 70")
+}
+
+# If/elif/else
+let x = 42
+if x > 100 {
+    print("x is big")
+} elif x > 10 {
+    print("x is medium")
+} else {
+    print("x is small")
+}
+
+# While loop
+let count = 0
+while count < 5 {
+    print("count = ", count)
+    count = count + 1
+}
+
+# List literal
+let items = [1, 2, 3, 4, 5]
+
+# For loop
+for item in items {
+    print("item: ", item)
+}
+
+# Dict literal
+let config = {"host": "localhost", "port": 8080}
+
+# Lambda
+let double = |x| x * 2
+print(double(21))
+
+# Nested function calls
+print(double(double(5)))
+
+# Boolean operators
+let a = True
+let b = False
+if a and not b {
+    print("a and not b is True")
+}
+
+if a or b {
+    print("a or b is True")
+}
+
+# Pass statement
+if False {
+    pass
+} else {
+    print("pass is a no-op")
+}

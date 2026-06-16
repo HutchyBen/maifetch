@@ -1,0 +1,117 @@
+# AltLua Demo — all major features
+# Comments use # (not -- like Lua)
+
+# ── Variables and constants ──
+let name = "AltLua"
+let year = 2026
+let pi = 3.14159
+let debug = True
+let nothing = None
+const MAX = 100
+
+# ── Arithmetic operators ──
+let sum = 1 + 2
+let diff = 10 - 3
+let product = 4 * 5
+let quotient = 20 / 3
+let int_div = 20 // 3
+let remainder = 20 % 3
+let power = 2 ** 10
+let neg = -5
+
+# ── String ops ──
+let greeting = "Hello" .. " " .. "World"
+
+# ── Comparisons and logic ──
+if sum == 3 {
+    print("sum is 3")
+}
+
+if diff != 7 {
+    print("diff is not 7")
+}
+
+if power > 500 and power < 1500 {
+    print("power is between 500 and 1500")
+}
+
+# ── Lists ──
+let items = [10, 20, 30, 40, 50]
+print("first:", items[1])
+
+# ── Dicts ──
+let config = {"host": "localhost", port: 8080}
+print("host:", config["host"])
+
+# ── Functions ──
+fn factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+print("factorial(5) = ", factorial(5))
+
+# ── Lambdas ──
+let double = |x| x * 2
+let add = |a, b| a + b
+print(double(21))
+print(add(3, 4))
+
+# ── If/elif/else ──
+let score = 85
+if score >= 90 {
+    print("A")
+} elif score >= 80 {
+    print("B")
+} elif score >= 70 {
+    print("C")
+} else {
+    print("D")
+}
+
+# ── For loops ──
+print("items:")
+for item in items {
+    print("  -", item)
+}
+
+# ── While loops ──
+print("countdown:")
+let n = 5
+while n > 0 {
+    print(" ", n)
+    n = n - 1
+}
+
+# ── Pass ──
+if False {
+    pass
+} else {
+    print("pass does nothing")
+}
+
+# ── Nested function calls ──
+print(double(double(double(2))))
+
+# ── Classes ──
+class Vec2 {
+    fn __init__(self, x, y) {
+        self.x = x
+        self.y = y
+    }
+
+    fn mag(self) {
+        return (self.x * self.x + self.y * self.y) ** 0.5
+    }
+
+    fn add(self, other) {
+        return Vec2.__init__({x: self.x + other.x, y: self.y + other.y}, 0, 0)
+    }
+}
+
+let v = {x: 3, y: 4}
+Vec2.__init__(v, 3, 4)
+print("magnitude of (3,4):", Vec2.mag(v))
+
+print("all done!")
