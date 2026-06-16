@@ -1,5 +1,5 @@
 # maifetch
-a really lazy fetch tool for [maitea](https://maitea.app) written in go\
+a really lazy fetch tool for [maitea](https://maitea.app) written in rust\
 also contains a little api wrapper for maitea too :D
 
 ![image](https://github.com/user-attachments/assets/96cd7018-8a00-4785-a1a8-9fe503263662)
@@ -23,7 +23,7 @@ obtained from `os.UserConfigDir`
 
 ## how to build
 1. clone the project with `git clone https://github.com/HutchyBen/maifetch`
-2. build with `go build maifetch/cmd/maifetch`
+2. build with `cargo build --release`
 3. run outputted executable ensuring access token is either
     - in config file
     - in environment variables
