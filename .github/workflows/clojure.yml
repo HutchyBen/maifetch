@@ -1,0 +1,21 @@
+# AI-assisted with OpenAI GPT-5 Codex.
+name: Clojure
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: DeLaGuardo/setup-clojure@13.4
+        with:
+          cli: latest
+      - name: Run tests
+        run: clojure -M:test
